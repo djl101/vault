@@ -102,6 +102,10 @@ func (b *backend) pathValidateCode(ctx context.Context, req *logical.Request, da
 		return logical.ErrorResponse(fmt.Sprintf("unknown key: %s", name)), nil
 	}
 
+	if len(code) != key.Digits.Length() {
+		return logical.ErrorResponse("an errpr occurred while validating the code"), otplib.ErrValidateInputInvalidLength
+	}
+
 	usedName := fmt.Sprintf("%s_%s", name, code)
 
 	_, ok := b.usedCodes.Get(usedName)

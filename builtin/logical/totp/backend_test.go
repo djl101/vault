@@ -330,14 +330,15 @@ func TestBackend_keyCrudDefaultValues(t *testing.T) {
 	}
 
 	code, _ := generateCode(key, 30, otplib.DigitsSix, otplib.AlgorithmSHA1)
-	invalidCode := "12345678"
-
+	invalidCode := "123456"
 	logicaltest.Test(t, logicaltest.TestCase{
 		LogicalBackend: b,
 		Steps: []logicaltest.TestStep{
 			testAccStepCreateKey(t, "test", keyData, false),
 			testAccStepReadKey(t, "test", expected),
 			testAccStepValidateCode(t, "test", code, true, false),
+			// Step should fail due to length of the code
+			testAccStepValidateCode(t, "test", code+" ", false, true),
 			// Next step should fail because it should be in the used cache
 			testAccStepValidateCode(t, "test", code, false, true),
 			testAccStepValidateCode(t, "test", invalidCode, false, false),
